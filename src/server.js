@@ -1,27 +1,29 @@
 import express from 'express';
 import cors from 'cors';
-import pino from 'pino';
-import pinoHttp from 'pino-http';
-import contactsRouter from './routes/contacts.js';
+import pino from 'pino-http';
+import contactsRoutes from './routes/contactsRoutes.js'; // buraya route'u import et
 
-export function setupServer() {
+export const setupServer = () => {
   const app = express();
+  const PORT = process.env.PORT || 3000;
 
-  // middleware
   app.use(cors());
-  app.use(express.json());
+  app.use(pino());
 
-  // logger (pino)
-  const logger = pino();
-  app.use(pinoHttp({ logger }));
+  app.use(express.json()); // JSON body parse için mutlaka ekle
 
-  // routes
-  app.use('/contacts', contactsRouter);
+  // Rotalar buraya eklenecek
+  app.use('/api/contacts', contactsRoutes);
 
-  // 404 handler for non-existing routes
-  app.use((req, res) => {
-    res.status(404).json({ message: 'Not found' });
+  // 404 için fallback
+ app.use((req, res) => {
+  res.status(404).json({ message: 'Not found' });
+});
+
+
+  app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
   });
 
-  return app;
-}
+
+};
