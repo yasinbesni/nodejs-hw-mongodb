@@ -13,12 +13,12 @@ export const setupServer = () => {
   app.use(express.json()); // JSON body parse için mutlaka ekle
 
   // Rotalar buraya eklenecek
-  app.use('/contacts', contactsRoutes);
+  app.use('/contacts/homeworknodejs', contactsRoutes);
 
   // 404 için fallback
- /* app.use((req, res) => {
+ app.use((req, res) => {
   res.status(404).json({ message: 'Not found' });
-}); */
+});
 
 
   app.listen(PORT, () => {
