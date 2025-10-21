@@ -14,7 +14,7 @@ export const setupServer = () => {
 
   // Rotalar buraya eklenecek
   app.use('/contacts', contactsRoutes);
-  app.get('/',(req,res)=>res.send('Cannot GET /'))
+  app.get('/',(req,res)=>res.send('Cannot GET    /'))
 
   // 404 için fallback
  app.use((req, res) => {
