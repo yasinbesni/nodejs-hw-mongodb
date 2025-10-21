@@ -1,7 +1,7 @@
 import dotenv from 'dotenv';
 dotenv.config();
 
-console.log('MONGODB_URI:', process.env.MONGODB_URI);
+console.log('MONGODB_URL:', process.env.MONGODB_URL);
 
 import { setupServer } from './server.js';
 import { initMongoConnection } from './db/initMongoConnection.js';
