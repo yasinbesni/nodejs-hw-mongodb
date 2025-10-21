@@ -13,7 +13,7 @@ export const setupServer = () => {
   app.use(express.json()); // JSON body parse için mutlaka ekle
 
   // Rotalar buraya eklenecek
-  app.use('/', contactsRoutes);
+  app.use('/cotacts', contactsRoutes);
 
   // 404 için fallback
  app.use((req, res) => {
