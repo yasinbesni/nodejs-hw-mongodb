@@ -15,7 +15,7 @@ export const setupServer = () => {
   app.use(express.json()); // JSON body parse için mutlaka ekle
 
   // Rotalar buraya eklenecek
-  app.use('/api/contacts', contactsRoutes);
+  app.use('/contacts', contactsRoutes);
 
   app.use(notFoundHandler);
 
