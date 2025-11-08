@@ -1,27 +1,20 @@
 import express from "express";
-import cors from "cors";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
+import cors from "cors";
 import morgan from "morgan";
 import cookieParser from "cookie-parser";
-import path from "path";
-import { fileURLToPath } from "url";
 
 import contactsRouter from "./routers/contacts.js";
 import authRouter from "./routers/auth.js";
 import { errorHandler } from "./middlewares/errorHandler.js";
 import { notFoundHandler } from "./middlewares/notFoundHandler.js";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+dotenv.config();
 
-dotenv.config({ path: path.resolve(__dirname, "../.env") });
-
-console.log("SMTP_HOST:", process.env.SMTP_HOST);
-console.log("JWT_SECRET VALUE:", process.env.JWT_SECRET);
-
-const PORT = process.env.PORT || 3000;
-const { MONGODB_URL, MONGODB_USER, MONGODB_PASSWORD, MONGODB_DB } = process.env;
+const PORT = Number(process.env.PORT) || 3000;
+const { MONGODB_URL, MONGODB_USER, MONGODB_PASSWORD, MONGODB_DB, MONGODB_URI } =
+  process.env;
 
 export const setupServer = async () => {
   const app = express();
@@ -41,15 +34,16 @@ export const setupServer = async () => {
   app.use(notFoundHandler);
   app.use(errorHandler);
 
-  const mongoUri = `mongodb+srv://${MONGODB_USER}:${MONGODB_PASSWORD}@${MONGODB_URL}/${MONGODB_DB}?retryWrites=true&w=majority`;
+  let mongoUri = MONGODB_URI;
+  if (!mongoUri) {
+    mongoUri = `mongodb+srv://${MONGODB_USER}:${MONGODB_PASSWORD}@${MONGODB_URL}/${MONGODB_DB}?retryWrites=true&w=majority`;
+  }
 
   try {
     await mongoose.connect(mongoUri);
     console.log("✅ MongoDB connected successfully!");
 
-    app.listen(PORT, "0.0.0.0", () => {
-      console.log(`🚀 Server running on port ${PORT}`);
-    });
+    app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
   } catch (error) {
     console.error("❌ MongoDB connection failed:", error.message);
     process.exit(1);
