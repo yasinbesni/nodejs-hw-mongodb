@@ -1,23 +1,21 @@
-import express from 'express';
+import express from "express";
 import {
-  createContact,
-  getContactById,
   getContactsController,
-  updateContact,
-  deleteContact,
-  patchContact,
-} from '../controllers/contacts.js';
-import { ctrlWrapper } from '../utils/ctrlWrapper.js';
-import { createContactSchema } from '../validation/contact.js';
-import { validateBody } from '../middlewares/validateBody.js';
-import { isValidId } from '../middlewares/isValidId.js';
+  getContactByIdController,
+  createContactController,
+  patchContactController,
+  deleteContactController,
+} from "../controllers/contacts.js";
+import { authenticate } from "../middlewares/authenticate.js";
+
 const router = express.Router();
 
-router.get('/', ctrlWrapper(getContactsController));         // Tüm kişileri listele
-router.post('/', validateBody(createContactSchema), ctrlWrapper(createContact));         // Yeni kişi ekle
-router.get('/:id', isValidId, ctrlWrapper(getContactById));      // ID ile kişi getir
-router.put('/:id', isValidId, validateBody(createContactSchema), ctrlWrapper(updateContact));       // ID ile kişi güncelle
-router.delete('/:id', isValidId, ctrlWrapper(deleteContact));    // ID ile kişi sil
-router.patch('/:id', isValidId, validateBody(createContactSchema), ctrlWrapper(patchContact))
+router.use(authenticate);
+
+router.get("/", getContactsController);
+router.get("/:contactId", getContactByIdController);
+router.post("/", createContactController);
+router.patch("/:contactId", patchContactController);
+router.delete("/:contactId", deleteContactController);
 
 export default router;
