@@ -7,15 +7,20 @@ import {
   deleteContactController,
 } from "../controllers/contacts.js";
 import { authenticate } from "../middlewares/authenticate.js";
+import { upload } from "../middlewares/upload.js";
 
 const router = express.Router();
 
 router.use(authenticate);
 
 router.get("/", getContactsController);
+
 router.get("/:contactId", getContactByIdController);
-router.post("/", createContactController);
-router.patch("/:contactId", patchContactController);
+
+router.post("/", upload.single("photo"), createContactController);
+
+router.patch("/:contactId", upload.single("photo"), patchContactController);
+
 router.delete("/:contactId", deleteContactController);
 
 export default router;
