@@ -1,37 +1,42 @@
-import jwt from "jsonwebtoken";
-import createHttpError from "http-errors";
-import { User } from "../db/models/User.js";
-
-const SECRET = process.env.JWT_SECRET || "supersecretjwtkey";
+import createHttpError from 'http-errors';
+import { SessionsCollection } from '../models/sessionModels.js';
+import { UsersCollection } from '../models/userModels.js';
 
 export const authenticate = async (req, res, next) => {
   try {
-    const authHeader = req.headers.authorization;
-    if (!authHeader) throw createHttpError(401, "Authorization header missing");
+    const authHeader = req.get('Authorization');
 
-    const [bearer, token] = authHeader.split(" ");
-    if (bearer !== "Bearer" || !token)
-      throw createHttpError(401, "Invalid authorization format");
+    if (!authHeader) {
+      return next(createHttpError(401, 'Please provide Authorization header'));
+    }
 
-    //  Token'ı doğrula
-    const decoded = jwt.verify(token, SECRET);
+    const [bearer, token] = authHeader.split(' ');
 
-    //  Kullanıcıyı bul
-    const user = await User.findById(decoded.id);
-    if (!user) throw createHttpError(401, "User not found");
+    if (bearer !== 'Bearer' || !token) {
+      return next(createHttpError(401, 'Auth header should be of type Bearer'));
+    }
 
-    // Request'e ekle
+    const session = await SessionsCollection.findOne({ accessToken: token });
+
+    if (!session) {
+      return next(createHttpError(401, 'Session not found'));
+    }
+
+    const isAccessTokenExpired = new Date() > new Date(session.accessTokenValidUntil);
+
+    if (isAccessTokenExpired) {
+      return next(createHttpError(401, 'Access token expired'));
+    }
+
+    const user = await UsersCollection.findById(session.userId);
+
+    if (!user) {
+      return next(createHttpError(401, 'User not found'));
+    }
+
     req.user = user;
-    console.log("Authenticated user:", user.email);
     next();
   } catch (error) {
-    // Token süresi dolmuş veya bozuksa burada yakala
-    if (error.name === "TokenExpiredError") {
-      next(createHttpError(401, "Access token expired"));
-    } else if (error.name === "JsonWebTokenError") {
-      next(createHttpError(401, "Invalid token"));
-    } else {
-      next(createHttpError(401, error.message));
-    }
+    next(error);
   }
 };

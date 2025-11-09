@@ -19,8 +19,8 @@ export const resetPasswordController = async (req, res, next) => {
     const user = await User.findOne({ email: decoded.email });
     if (!user) throw createHttpError(404, "User not found!");
 
-    const hash = await bcrypt.hash(password, 10);
-    user.password = hash;
+    const passHash = await bcrypt.hash(password, 10);
+    user.password = passHash;
 
     if (user.refreshToken) user.refreshToken = null;
     await user.save();

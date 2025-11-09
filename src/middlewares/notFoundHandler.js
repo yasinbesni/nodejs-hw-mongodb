@@ -1,5 +1,15 @@
-import createError from "http-errors";
+import { HttpError } from 'http-errors';
 
-export const notFoundHandler = (req, res, next) => {
-  next(createError(404, "Route not found"));
+export const notFoundHandler = (err, req, res, next) => {
+  if (err instanceof HttpError) {
+    res.status(err.status).json({
+      status: err.status,
+      message: err.name,
+      data: err,
+    });
+    return;
+  }
+  res.status(404).json({
+    message: 'Route not found',
+  });
 };
