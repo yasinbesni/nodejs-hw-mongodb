@@ -1,17 +1,20 @@
 import mongoose from 'mongoose';
 
+import { getEnvVar } from '../utils/getEnvVar.js';
+
 export const initMongoConnection = async () => {
   try {
-    const { MONGODB_URI } = process.env;
+    const user = getEnvVar('MONGODB_USER');
+    const pwd = getEnvVar('MONGODB_PASSWORD');
+    const url = getEnvVar('MONGODB_URL');
+    const db = getEnvVar('MONGODB_DB');
 
-    if (!MONGODB_URI) {
-      throw new Error('MONGODB_URI is not defined in environment variables');
-    }
-
-    await mongoose.connect(MONGODB_URI);
+    await mongoose.connect(
+      `mongodb+srv://${user}:${pwd}@${url}/${db}?retryWrites=true&w=majority`
+    );
     console.log('Mongo connection successfully established!');
-  } catch (error) {
-    console.error('Mongo connection failed:', error.message);
-    process.exit(1);
+  } catch (e) {
+    console.log('Error while setting up mongo connection', e);
+    throw e;
   }
 };
