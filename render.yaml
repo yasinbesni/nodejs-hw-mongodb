@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: nodejs-hw-mongodb
+    env: node
+    plan: free
+    branch: hw7-swagger   # Bu branch otomatik deploy edilecek
+    buildCommand: npm install
+    startCommand: node src/index.js
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
